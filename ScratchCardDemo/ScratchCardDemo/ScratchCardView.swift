@@ -7,10 +7,13 @@ struct ScratchCardView: View {
     @State private var confettiPieces: [ConfettiPiece] = []
     @State private var showConfetti = false
     @State private var cursorPosition: CGPoint? = nil
+    @State private var scratchSessionStart: Date? = nil
+    @State private var accumulatedScratchTime: TimeInterval = 0
 
     private let cardWidth: CGFloat = 343
     private let cardHeight: CGFloat = 447
     private let brushRadius: CGFloat = 36
+    private let minimumScratchDuration: TimeInterval = 2.0
 
     var body: some View {
         ZStack {
@@ -98,6 +101,9 @@ struct ScratchCardView: View {
     private var scratchGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
+                if scratchSessionStart == nil {
+                    scratchSessionStart = Date()
+                }
                 cursorPosition = value.location
                 scratchPath.append(value.location)
                 feedback.startScratchSound()
@@ -105,6 +111,10 @@ struct ScratchCardView: View {
                 checkRevealThreshold()
             }
             .onEnded { _ in
+                if let scratchSessionStart {
+                    accumulatedScratchTime += Date().timeIntervalSince(scratchSessionStart)
+                    self.scratchSessionStart = nil
+                }
                 cursorPosition = nil
                 feedback.stopScratchSound()
                 checkRevealThreshold()
@@ -112,7 +122,8 @@ struct ScratchCardView: View {
     }
 
     private func checkRevealThreshold() {
-        guard !isRevealed, coveredArea() >= 0.45 else { return }
+        let currentScratchDuration = accumulatedScratchTime + activeScratchSessionDuration
+        guard !isRevealed, currentScratchDuration >= minimumScratchDuration, coveredArea() >= 0.45 else { return }
         feedback.stopScratchSound()
         withAnimation(.spring(response: 0.5, dampingFraction: 0.72)) {
             isRevealed = true
@@ -165,6 +176,13 @@ struct ScratchCardView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
             scratchPath = []
             confettiPieces = []
+            scratchSessionStart = nil
+            accumulatedScratchTime = 0
         }
+    }
+
+    private var activeScratchSessionDuration: TimeInterval {
+        guard let scratchSessionStart else { return 0 }
+        return Date().timeIntervalSince(scratchSessionStart)
     }
 }
