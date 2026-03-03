@@ -8,21 +8,13 @@ struct ScratchCardView: View {
     @State private var showConfetti = false
     @State private var cursorPosition: CGPoint? = nil
 
-    private let cardWidth: CGFloat = 300
-    private let cardHeight: CGFloat = 440
+    private let cardWidth: CGFloat = 343
+    private let cardHeight: CGFloat = 447
     private let brushRadius: CGFloat = 36
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [
-                    Color(red: 0.18, green: 0.22, blue: 0.26),
-                    Color(red: 0.10, green: 0.13, blue: 0.16)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackgroundView()
 
             VStack(spacing: 0) {
                 HStack(spacing: 14) {
@@ -69,7 +61,7 @@ struct ScratchCardView: View {
                             .allowsHitTesting(false)
                     }
                 }
-                .shadow(color: .black.opacity(0.4), radius: 24, y: 12)
+                .shadow(color: .black.opacity(0.35), radius: 28, y: 16)
 
                 Group {
                     if isRevealed {
