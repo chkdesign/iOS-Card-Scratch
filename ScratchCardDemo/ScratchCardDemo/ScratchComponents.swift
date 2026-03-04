@@ -80,22 +80,13 @@ struct ScratchOverlayView: View {
                 Path(CGRect(origin: .zero, size: size)),
                 with: .linearGradient(
                     Gradient(colors: [
-                        Color.white.opacity(0.95),
-                        Color(red: 0.67, green: 0.90, blue: 1.0, opacity: 0.95),
-                        Color(red: 0.07, green: 0.72, blue: 0.97, opacity: 0.95)
+                        Color.white.opacity(1.0),
+                        Color(red: 0.78, green: 0.93, blue: 1.0, opacity: 1.0),
+                        Color(red: 0.10, green: 0.73, blue: 0.97, opacity: 1.0)
                     ]),
                     startPoint: .zero,
                     endPoint: CGPoint(x: size.width, y: size.height)
                 )
-            )
-
-            context.draw(
-                Text("SCRATCH TO REVEAL")
-                    .font(.system(size: 11, weight: .medium))
-                    .tracking(3)
-                    .foregroundColor(Color(red: 0.10, green: 0.34, blue: 0.46, opacity: 0.5)),
-                at: CGPoint(x: size.width / 2, y: size.height / 2),
-                anchor: .center
             )
 
             context.blendMode = .clear
