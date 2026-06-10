@@ -103,11 +103,12 @@ struct ScratchCardView: View {
             .onChanged { value in
                 if scratchSessionStart == nil {
                     scratchSessionStart = Date()
+                    feedback.startScratchHaptic(at: value.location)
                 }
                 cursorPosition = value.location
                 scratchPath.append(value.location)
                 feedback.startScratchSound()
-                feedback.scratchHaptic()
+                feedback.scratchHaptic(at: value.location)
                 checkRevealThreshold()
             }
             .onEnded { _ in
@@ -117,6 +118,7 @@ struct ScratchCardView: View {
                 }
                 cursorPosition = nil
                 feedback.stopScratchSound()
+                feedback.endScratchHaptic()
                 checkRevealThreshold()
             }
     }

@@ -23,7 +23,9 @@ final class ScratchFeedbackManager: ObservableObject {
     private let mediumImpact = UIImpactFeedbackGenerator(style: .medium)
     private let successFeedback = UINotificationFeedbackGenerator()
     private var lastHapticTime: Date = .distantPast
+    private var lastScratchHapticLocation: CGPoint?
     private let hapticThrottle: TimeInterval = 0.04
+    private let hapticDistance: CGFloat = 10
 
     init() {
         setupAudioEngine()
@@ -140,12 +142,32 @@ final class ScratchFeedbackManager: ObservableObject {
         winNode.play()
     }
 
-    func scratchHaptic() {
+    func startScratchHaptic(at location: CGPoint) {
         guard isHapticsEnabled else { return }
+        lastScratchHapticLocation = location
+        lastHapticTime = Date()
+        lightImpact.impactOccurred(intensity: 0.5)
+        lightImpact.prepare()
+    }
+
+    func scratchHaptic(at location: CGPoint) {
+        guard isHapticsEnabled else { return }
+        if let lastScratchHapticLocation {
+            let dx = location.x - lastScratchHapticLocation.x
+            let dy = location.y - lastScratchHapticLocation.y
+            guard hypot(dx, dy) >= hapticDistance else { return }
+        }
+
         let now = Date()
         guard now.timeIntervalSince(lastHapticTime) >= hapticThrottle else { return }
         lastHapticTime = now
+        lastScratchHapticLocation = location
         lightImpact.impactOccurred(intensity: 0.45)
+        lightImpact.prepare()
+    }
+
+    func endScratchHaptic() {
+        lastScratchHapticLocation = nil
     }
 
     func winHaptic() {

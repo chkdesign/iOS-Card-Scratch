@@ -106,15 +106,19 @@ struct ScratchCardView: View {
     private var scratchGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
+                if cursorPosition == nil {
+                    feedback.startScratchHaptic(at: value.location)
+                }
                 cursorPosition = value.location
                 scratchPath.append(value.location)
                 feedback.startScratchSound()
-                feedback.scratchHaptic()
+                feedback.scratchHaptic(at: value.location)
                 checkRevealThreshold()
             }
             .onEnded { _ in
                 cursorPosition = nil
                 feedback.stopScratchSound()
+                feedback.endScratchHaptic()
                 checkRevealThreshold()
             }
     }
